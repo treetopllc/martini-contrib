@@ -82,6 +82,8 @@ type Options struct {
 	Layout string
 	// Extensions to parse template files from. Defaults to [".tmpl"]
 	Extensions []string
+	// KeepExtensions determines if template extensions should be removed from template names. Default is false.
+	KeepExtensions bool
 	// Funcs is a slice of FuncMaps to apply to the template upon compilation. This is useful for helper functions. Defaults to [].
 	Funcs []template.FuncMap
 	// Delims sets the action delimiters to the specified strings in the Delims struct.
@@ -165,7 +167,10 @@ func compile(options Options) *template.Template {
 					panic(err)
 				}
 
-				name := (r[0 : len(r)-len(ext)])
+				name := r
+				if !options.KeepExtensions {
+					name = (r[0 : len(r)-len(ext)])
+				}
 				tmpl := t.New(filepath.ToSlash(name))
 
 				// add our funcmaps

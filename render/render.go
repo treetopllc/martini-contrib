@@ -34,6 +34,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 const (
@@ -78,6 +79,8 @@ type Delims struct {
 type Options struct {
 	// Directory to load templates. Default is "templates"
 	Directory string
+	// Exclusions is a set of directories under Directory that should not be used for templates. Paths should be relative to Directory Default is ""
+	Exclusions []string
 	// Layout template name. Will not render a layout if "". Defaults to "".
 	Layout string
 	// Extensions to parse template files from. Defaults to [".tmpl"]
@@ -158,29 +161,39 @@ func compile(options Options) *template.Template {
 			return err
 		}
 
-		ext := filepath.Ext(r)
-		for _, extension := range options.Extensions {
-			if ext == extension {
+		include := true
+		pathDir := filepath.Dir(r)
+		for _, exclusion := range options.Exclusions {
+			if strings.HasPrefix(pathDir, exclusion) {
+				include = false
+			}
+		}
 
-				buf, err := ioutil.ReadFile(path)
-				if err != nil {
-					panic(err)
+		if include {
+			ext := filepath.Ext(r)
+			for _, extension := range options.Extensions {
+				if ext == extension {
+
+					buf, err := ioutil.ReadFile(path)
+					if err != nil {
+						panic(err)
+					}
+
+					name := r
+					if !options.KeepExtensions {
+						name = (r[0 : len(r)-len(ext)])
+					}
+					tmpl := t.New(filepath.ToSlash(name))
+
+					// add our funcmaps
+					for _, funcs := range options.Funcs {
+						tmpl.Funcs(funcs)
+					}
+
+					// Bomb out if parse fails. We don't want any silent server starts.
+					template.Must(tmpl.Funcs(helperFuncs).Parse(string(buf)))
+					break
 				}
-
-				name := r
-				if !options.KeepExtensions {
-					name = (r[0 : len(r)-len(ext)])
-				}
-				tmpl := t.New(filepath.ToSlash(name))
-
-				// add our funcmaps
-				for _, funcs := range options.Funcs {
-					tmpl.Funcs(funcs)
-				}
-
-				// Bomb out if parse fails. We don't want any silent server starts.
-				template.Must(tmpl.Funcs(helperFuncs).Parse(string(buf)))
-				break
 			}
 		}
 

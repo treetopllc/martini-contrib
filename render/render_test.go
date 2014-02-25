@@ -145,6 +145,26 @@ func Test_Render_KeepExtensions(t *testing.T) {
 	expect(t, res.Body.String(), "Hypertext!\n")
 }
 
+func Test_Render_Exclusions(t *testing.T) {
+	m := martini.Classic()
+	m.Use(Renderer(Options{
+		Directory:  "fixtures/basic",
+		Exclusions: []string{"admin"},
+	}))
+
+	m.Get("/foobar", func(r Render) {
+		r.HTML(200, "admin/index", nil)
+	})
+
+	res := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/foobar", nil)
+
+	m.ServeHTTP(res, req)
+
+	expect(t, res.Code, 500)
+	expect(t, res.Header().Get(ContentType), "text/plain; charset=utf-8")
+}
+
 func Test_Render_Funcs(t *testing.T) {
 
 	m := martini.Classic()

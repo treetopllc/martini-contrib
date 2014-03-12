@@ -2,7 +2,7 @@ package auth
 
 import (
 	"encoding/base64"
-	"github.com/codegangsta/martini"
+	"github.com/treetopllc/martini"
 	"net/http"
 	"net/http/httptest"
 	"testing"

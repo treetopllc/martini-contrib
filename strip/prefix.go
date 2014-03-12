@@ -3,7 +3,7 @@
 package strip
 
 import (
-	"github.com/codegangsta/martini"
+	"github.com/treetopllc/martini"
 	"net/http"
 	"strings"
 )

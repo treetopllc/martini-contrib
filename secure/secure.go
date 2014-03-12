@@ -25,7 +25,7 @@ package secure
 
 import (
 	"fmt"
-	"github.com/codegangsta/martini"
+	"github.com/treetopllc/martini"
 	"net/http"
 	"strings"
 )

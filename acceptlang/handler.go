@@ -17,7 +17,7 @@ package acceptlang
 import (
 	"bytes"
 	"fmt"
-	"github.com/codegangsta/martini"
+	"github.com/treetopllc/martini"
 	"net/http"
 	"sort"
 	"strconv"

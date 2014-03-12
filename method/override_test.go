@@ -1,7 +1,7 @@
 package method
 
 import (
-	"github.com/codegangsta/martini"
+	"github.com/treetopllc/martini"
 	"net/http"
 	"net/http/httptest"
 	"testing"

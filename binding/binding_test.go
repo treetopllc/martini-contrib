@@ -1,15 +1,15 @@
 package binding
 
 import (
+	"bytes"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"strconv"
+	"strings"
 	"testing"
-	"mime/multipart"
-	"bytes"
 
-	"github.com/codegangsta/martini"
+	"github.com/treetopllc/martini"
 )
 
 func TestBind(t *testing.T) {

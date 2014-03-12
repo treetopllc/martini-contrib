@@ -20,9 +20,9 @@
 package sessions
 
 import (
-	"github.com/codegangsta/martini"
 	"github.com/gorilla/context"
 	"github.com/gorilla/sessions"
+	"github.com/treetopllc/martini"
 	"log"
 	"net/http"
 )

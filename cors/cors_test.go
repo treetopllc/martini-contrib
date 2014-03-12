@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/codegangsta/martini"
+	"github.com/treetopllc/martini"
 )
 
 func Test_AllowAll(t *testing.T) {

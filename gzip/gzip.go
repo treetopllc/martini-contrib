@@ -2,7 +2,7 @@ package gzip
 
 import (
 	"compress/gzip"
-	"github.com/codegangsta/martini"
+	"github.com/treetopllc/martini"
 	"net/http"
 	"strings"
 )

@@ -1,7 +1,7 @@
 package acceptlang
 
 import (
-	"github.com/codegangsta/martini"
+	"github.com/treetopllc/martini"
 	"net/http"
 	"net/http/httptest"
 	"reflect"

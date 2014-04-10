@@ -163,6 +163,7 @@ func compile(options Options) *template.Template {
 }
 
 func recursiveCompile(options Options, dir string, t *template.Template) {
+	_, relBase := filepath.Split(dir)
 	filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		r, err := filepath.Rel(dir, path)
 		if err != nil {
@@ -193,7 +194,7 @@ func recursiveCompile(options Options, dir string, t *template.Template) {
 					}
 					tmplName := filepath.ToSlash(name)
 					if options.KeepPath {
-						tmplName = dir + "/" + tmplName
+						tmplName = relBase + "/" + tmplName
 					}
 					tmpl := t.New(tmplName)
 

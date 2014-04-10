@@ -77,8 +77,9 @@ type Delims struct {
 
 // Options is a struct for specifying configuration options for the render.Renderer middleware
 type Options struct {
-	// Directory to load templates. Default is "templates"
-	Directory string
+	// Include paths to load templates from. Default is "templates", if not empty this is
+	// used in place of Directory
+	Includes []string
 	// Exclusions is a set of directories under Directory that should not be used for templates. Paths should be relative to Directory Default is ""
 	Exclusions []string
 	// Layout template name. Will not render a layout if "". Defaults to "".
@@ -87,6 +88,8 @@ type Options struct {
 	Extensions []string
 	// KeepExtensions determines if template extensions should be removed from template names. Default is false.
 	KeepExtensions bool
+	// KeepPath keeps the full directory path in the template name. Default is false.
+	KeepPath bool
 	// Funcs is a slice of FuncMaps to apply to the template upon compilation. This is useful for helper functions. Defaults to [].
 	Funcs []template.FuncMap
 	// Delims sets the action delimiters to the specified strings in the Delims struct.
@@ -138,8 +141,8 @@ func prepareOptions(options []Options) Options {
 	}
 
 	// Defaults
-	if len(opt.Directory) == 0 {
-		opt.Directory = "templates"
+	if len(opt.Includes) == 0 {
+		opt.Includes = []string{"templates"}
 	}
 	if len(opt.Extensions) == 0 {
 		opt.Extensions = []string{".tmpl"}
@@ -149,12 +152,17 @@ func prepareOptions(options []Options) Options {
 }
 
 func compile(options Options) *template.Template {
-	dir := options.Directory
-	t := template.New(dir)
+	t := template.New("")
 	t.Delims(options.Delims.Left, options.Delims.Right)
 	// parse an initial template in case we don't have any
 	template.Must(t.Parse("Martini"))
+	for _, dir := range options.Includes {
+		recursiveCompile(options, dir, t)
+	}
+	return t
+}
 
+func recursiveCompile(options Options, dir string, t *template.Template) {
 	filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		r, err := filepath.Rel(dir, path)
 		if err != nil {
@@ -183,7 +191,11 @@ func compile(options Options) *template.Template {
 					if !options.KeepExtensions {
 						name = (r[0 : len(r)-len(ext)])
 					}
-					tmpl := t.New(filepath.ToSlash(name))
+					tmplName := filepath.ToSlash(name)
+					if options.KeepPath {
+						tmplName = dir + "/" + tmplName
+					}
+					tmpl := t.New(tmplName)
 
 					// add our funcmaps
 					for _, funcs := range options.Funcs {
@@ -196,11 +208,8 @@ func compile(options Options) *template.Template {
 				}
 			}
 		}
-
 		return nil
 	})
-
-	return t
 }
 
 type renderer struct {

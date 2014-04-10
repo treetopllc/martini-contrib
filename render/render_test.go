@@ -63,7 +63,7 @@ func Test_Render_Indented_JSON(t *testing.T) {
 func Test_Render_Bad_HTML(t *testing.T) {
 	m := martini.Classic()
 	m.Use(Renderer(Options{
-		Directory: "fixtures/basic",
+		Includes: []string{"fixtures/basic"},
 	}))
 
 	// routing
@@ -83,7 +83,7 @@ func Test_Render_Bad_HTML(t *testing.T) {
 func Test_Render_HTML(t *testing.T) {
 	m := martini.Classic()
 	m.Use(Renderer(Options{
-		Directory: "fixtures/basic",
+		Includes: []string{"fixtures/basic"},
 	}))
 
 	// routing
@@ -104,7 +104,7 @@ func Test_Render_HTML(t *testing.T) {
 func Test_Render_Extensions(t *testing.T) {
 	m := martini.Classic()
 	m.Use(Renderer(Options{
-		Directory:  "fixtures/basic",
+		Includes:   []string{"fixtures/basic"},
 		Extensions: []string{".tmpl", ".html"},
 	}))
 
@@ -126,8 +126,8 @@ func Test_Render_Extensions(t *testing.T) {
 func Test_Render_KeepExtensions(t *testing.T) {
 	m := martini.Classic()
 	m.Use(Renderer(Options{
-		Directory:  "fixtures/basic",
-		Extensions: []string{".tmpl", ".html"},
+		Includes:       []string{"fixtures/basic"},
+		Extensions:     []string{".tmpl", ".html"},
 		KeepExtensions: true,
 	}))
 
@@ -148,7 +148,7 @@ func Test_Render_KeepExtensions(t *testing.T) {
 func Test_Render_Exclusions(t *testing.T) {
 	m := martini.Classic()
 	m.Use(Renderer(Options{
-		Directory:  "fixtures/basic",
+		Includes:   []string{"fixtures/basic"},
 		Exclusions: []string{"admin"},
 	}))
 
@@ -169,7 +169,7 @@ func Test_Render_Funcs(t *testing.T) {
 
 	m := martini.Classic()
 	m.Use(Renderer(Options{
-		Directory: "fixtures/custom_funcs",
+		Includes: []string{"fixtures/custom_funcs"},
 		Funcs: []template.FuncMap{
 			{
 				"myCustomFunc": func() string {
@@ -195,8 +195,8 @@ func Test_Render_Funcs(t *testing.T) {
 func Test_Render_Layout(t *testing.T) {
 	m := martini.Classic()
 	m.Use(Renderer(Options{
-		Directory: "fixtures/basic",
-		Layout:    "layout",
+		Includes: []string{"fixtures/basic"},
+		Layout:   "layout",
 	}))
 
 	// routing
@@ -215,7 +215,7 @@ func Test_Render_Layout(t *testing.T) {
 func Test_Render_Nested_HTML(t *testing.T) {
 	m := martini.Classic()
 	m.Use(Renderer(Options{
-		Directory: "fixtures/basic",
+		Includes: []string{"fixtures/basic"},
 	}))
 
 	// routing
@@ -236,8 +236,8 @@ func Test_Render_Nested_HTML(t *testing.T) {
 func Test_Render_Delimiters(t *testing.T) {
 	m := martini.Classic()
 	m.Use(Renderer(Options{
-		Delims:    Delims{"{[{", "}]}"},
-		Directory: "fixtures/basic",
+		Delims:   Delims{"{[{", "}]}"},
+		Includes: []string{"fixtures/basic"},
 	}))
 
 	// routing
@@ -323,7 +323,7 @@ func Test_Render_Charset_JSON(t *testing.T) {
 func Test_Render_Default_Charset_HTML(t *testing.T) {
 	m := martini.Classic()
 	m.Use(Renderer(Options{
-		Directory: "fixtures/basic",
+		Includes: []string{"fixtures/basic"},
 	}))
 
 	// routing
@@ -346,8 +346,8 @@ func Test_Render_Default_Charset_HTML(t *testing.T) {
 func Test_Render_Override_Layout(t *testing.T) {
 	m := martini.Classic()
 	m.Use(Renderer(Options{
-		Directory: "fixtures/basic",
-		Layout:    "layout",
+		Includes: []string{"fixtures/basic"},
+		Layout:   "layout",
 	}))
 
 	// routing

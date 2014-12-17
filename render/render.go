@@ -25,6 +25,7 @@ package render
 
 import (
 	"bytes"
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"github.com/treetopllc/martini"
@@ -38,11 +39,14 @@ import (
 )
 
 const (
-	ContentType    = "Content-Type"
-	ContentLength  = "Content-Length"
-	ContentJSON    = "application/json"
-	ContentHTML    = "text/html"
-	defaultCharset = "UTF-8"
+	ContentType         = "Content-Type"
+	ContentDisposition  = "Content-Disposition"
+	attachment_filename = "attachment;filename="
+	ContentLength       = "Content-Length"
+	ContentJSON         = "application/json"
+	ContentCSV          = "application/csv"
+	ContentHTML         = "text/html"
+	defaultCharset      = "UTF-8"
 )
 
 // Included helper functions for use when rendering html
@@ -57,6 +61,8 @@ var helperFuncs = template.FuncMap{
 type Render interface {
 	// JSON writes the given status and JSON serialized version of the given value to the http.ResponseWriter.
 	JSON(status int, v interface{})
+	// CSV writes the given status and CSV serialized version of the given value to the http.ResponseWriter.
+	CSV(status int, v interface{}, filename ...interface{})
 	// HTML renders a html template specified by the name and writes the result and given status to the http.ResponseWriter.
 	HTML(status int, name string, v interface{}, htmlOpt ...HTMLOptions)
 	// Error is a convenience function that writes an http status to the http.ResponseWriter.
@@ -228,6 +234,38 @@ func (r *renderer) JSON(status int, v interface{}) {
 	r.Header().Set(ContentType, ContentJSON+r.compiledCharset)
 	r.WriteHeader(status)
 	r.Write(result)
+}
+
+// CsvEncoder is an Encoder that produces csv-formatted responses.
+func (r *renderer) CSV(status int, v interface{}, filenameArg ...interface{}) {
+
+	var fileName string
+	if len(filenameArg) == 0 {
+		fileName = "export.csv"
+	} else {
+		fileName = filenameArg[0].(string)
+	}
+
+	sourceData, ok := v.([][]string)
+	if !ok {
+		http.Error(r, "Provided CSV data not an array as expected", http.StatusInternalServerError)
+		return
+	}
+
+	var buf bytes.Buffer
+	csvData := make([][]string, 0, len(sourceData)+1)
+	for _, line := range sourceData {
+		csvData = append(csvData, line)
+	}
+	writer := csv.NewWriter(&buf)
+	writer.WriteAll(csvData)
+	writer.Flush()
+
+	// csv rendered fine, write out the result
+	r.Header().Set(ContentType, ContentCSV+r.compiledCharset)
+	r.Header().Set(ContentDisposition, attachment_filename+fileName)
+	r.WriteHeader(status)
+	r.Write(buf.Bytes())
 }
 
 func (r *renderer) HTML(status int, name string, binding interface{}, htmlOpt ...HTMLOptions) {
